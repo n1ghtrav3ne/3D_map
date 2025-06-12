@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FaSearch } from "react-icons/fa";
 import { useCountrySearch } from "@/hooks/useCountrySearch";
+import { BsSearch } from "react-icons/bs";
 
 interface SearchBarProps {
     onSearch?: (value: string) => void;
@@ -50,7 +50,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
                 onClick={handleClick}
                 className="rounded-full cursor-pointer text-[14px] max-w-[60px] max-h-[60px] flex justify-center bg-[#8000FF] p-3 items-center"
             >
-                <FaSearch
+                <BsSearch
                     size={20}
                     className={`${select ? 'rotate-[360deg]' : 'rotate-0'} transition-all duration-1000`}
                 />

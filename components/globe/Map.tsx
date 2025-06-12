@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import {useRef, useEffect, useState, useMemo} from 'react';
 import type { GlobeMethods } from 'react-globe.gl';
 import LoadingSpinner from "@/components/global/LoadingSpinner";
+import {Country} from "@/types/country";
 
 const PopUp = dynamic(() => import('@/components/global/PopUp'));
 const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
@@ -13,7 +14,7 @@ interface GlobeWithSearchProps {
     nightMode: boolean;
 }
 
-const GlobeWithSearch = ({ searchQuery,nightMode }: GlobeWithSearchProps) => {
+const Map = ({ searchQuery,nightMode }: GlobeWithSearchProps) => {
     const globeRef = useRef<GlobeMethods | undefined>(undefined);
 
     const [loading,setLoading] = useState(false);
@@ -26,25 +27,27 @@ const GlobeWithSearch = ({ searchQuery,nightMode }: GlobeWithSearchProps) => {
 
         setLoading(true);
 
-        try{
-            const res = await fetch(`https://restcountries.com/v3.1/name/${countryName}`);
-            const data = await res.json();
+        try {
+            const res = await fetch(`https://restcountries.com/v3.1/name/${countryName}?fields=name,latlng,cca2,cca3`);
+            const data: Country[] = await res.json();
 
             if (!data || !data[0]?.latlng) {
-                    setErrorMessage("هیج کشوری پیدا نشد!")
-                    setError(true);
-                    return;
+                setErrorMessage("هیچ کشوری پیدا نشد!");
+                setError(true);
+                return;
             }
+
             const [lat, lng] = data[0].latlng;
             globeRef.current?.pointOfView({ lat, lng, altitude: 0.4 }, 1500);
-        }catch (err){
+        } catch (err) {
             console.error(err);
-            setErrorMessage("خطای غیر منتظره ای رخ داد!");
+            setErrorMessage("خطای غیر منتظره‌ای رخ داد!");
             setError(true);
-        }finally {
+        } finally {
             setLoading(false);
         }
     };
+
 
     useEffect(() => {
         if (searchQuery) {
@@ -80,4 +83,4 @@ const GlobeWithSearch = ({ searchQuery,nightMode }: GlobeWithSearchProps) => {
     );
 };
 
-export default GlobeWithSearch;
+export default Map;

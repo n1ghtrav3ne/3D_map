@@ -16,7 +16,7 @@ const NightMode = ({night,setNight}:nightModeProps) => {
     return (
         <div onClick={toggleNightMode}
              className={`${night?'bg-amber-400':'bg-[#000DA1]'} 
-             fixed z-50 flex duration-300 flex-col mr-6 lg:mr-12 top-[20%] lg:top-[20%] 
+             fixed z-50 flex duration-300 flex-col mr-6 left-6 lg:left-12 top-[20%] lg:top-[20%] 
              p-3 shadow cursor-pointer overflow-hidden rounded-full`}
         >
             <FaRegMoon className={`${night?'-translate-y-[150%] rotate-[360deg] transition-all':'translate-y-0'}
