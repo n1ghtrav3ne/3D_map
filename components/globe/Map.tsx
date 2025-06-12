@@ -1,11 +1,11 @@
 'use client'
 
 import dynamic from 'next/dynamic';
-import {useRef, useEffect, useState} from 'react';
+import {useRef, useEffect, useState, useMemo} from 'react';
 import type { GlobeMethods } from 'react-globe.gl';
 import LoadingSpinner from "@/components/global/LoadingSpinner";
-import PopUp from "@/components/global/PopUp";
 
+const PopUp = dynamic(() => import('@/components/global/PopUp'));
 const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
 
 interface GlobeWithSearchProps {
@@ -52,6 +52,12 @@ const GlobeWithSearch = ({ searchQuery,nightMode }: GlobeWithSearchProps) => {
         }
     }, [searchQuery]);
 
+    const globeImageUrl = useMemo(() => (
+        nightMode ? '/globe/earth-night.jpg' : '/globe/earth-blue-marble.jpg'
+    ), [nightMode]);
+
+    const backgroundImageUrl = useMemo(() => '/globe/night-sky.png', []);
+
     return (
         <div
             className="fixed top-0"
@@ -66,8 +72,8 @@ const GlobeWithSearch = ({ searchQuery,nightMode }: GlobeWithSearchProps) => {
 
                 <Globe
                     ref={globeRef}
-                    globeImageUrl={nightMode?'/globe/earth-night.jpg':'/globe/earth-blue-marble.jpg'}
-                    backgroundImageUrl="/globe/night-sky.png"
+                    globeImageUrl={globeImageUrl}
+                    backgroundImageUrl={backgroundImageUrl}
                 />
             </div>
         </div>
