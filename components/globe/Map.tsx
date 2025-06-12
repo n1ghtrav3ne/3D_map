@@ -1,0 +1,77 @@
+'use client'
+
+import dynamic from 'next/dynamic';
+import {useRef, useEffect, useState} from 'react';
+import type { GlobeMethods } from 'react-globe.gl';
+import LoadingSpinner from "@/components/global/LoadingSpinner";
+import PopUp from "@/components/global/PopUp";
+
+const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
+
+interface GlobeWithSearchProps {
+    searchQuery: string;
+    nightMode: boolean;
+}
+
+const GlobeWithSearch = ({ searchQuery,nightMode }: GlobeWithSearchProps) => {
+    const globeRef = useRef<GlobeMethods | undefined>(undefined);
+
+    const [loading,setLoading] = useState(false);
+    const [error,setError]=useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+
+
+    const handleZoomToCountry = async (countryName: string) => {
+        if (!countryName) return;
+
+        setLoading(true);
+
+        try{
+            const res = await fetch(`https://restcountries.com/v3.1/name/${countryName}`);
+            const data = await res.json();
+
+            if (!data || !data[0]?.latlng) {
+                    setErrorMessage("هیج کشوری پیدا نشد!")
+                    setError(true);
+                    return;
+            }
+            const [lat, lng] = data[0].latlng;
+            globeRef.current?.pointOfView({ lat, lng, altitude: 0.4 }, 1500);
+        }catch (err){
+            console.error(err);
+            setErrorMessage("خطای غیر منتظره ای رخ داد!");
+            setError(true);
+        }finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (searchQuery) {
+            handleZoomToCountry(searchQuery);
+        }
+    }, [searchQuery]);
+
+    return (
+        <div
+            className="fixed top-0"
+            style={{ height: 'var(--app-height)' }}
+        >
+            <div className="w-full h-full">
+                {loading && (
+                        <LoadingSpinner />
+                )}
+
+                {error && <PopUp close={() => setError(false)} errorText={errorMessage} />}
+
+                <Globe
+                    ref={globeRef}
+                    globeImageUrl={nightMode?'/globe/earth-night.jpg':'/globe/earth-blue-marble.jpg'}
+                    backgroundImageUrl="/globe/night-sky.png"
+                />
+            </div>
+        </div>
+    );
+};
+
+export default GlobeWithSearch;
